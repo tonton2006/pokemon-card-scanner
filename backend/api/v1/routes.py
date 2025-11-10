@@ -53,9 +53,6 @@ async def scan_card(image: UploadFile = File(...)):
     start_time = time.time()
 
     try:
-        # TODO: Implement actual scanning logic
-        # For now, return a stub response
-
         # Validate image
         if not image.content_type or not image.content_type.startswith("image/"):
             raise InvalidImageException(
@@ -72,31 +69,25 @@ async def scan_card(image: UploadFile = File(...)):
                 details={"size_bytes": len(image_bytes)}
             )
 
-        # TODO: Call OCR service
-        # TODO: Call pricing service
+        # Import services (lazy import to avoid circular dependencies)
+        from services.ocr_service import ocr_service
+        from services.price_service import price_service
 
-        # Stub response for now
+        # Extract card info using OCR
+        card_info = await ocr_service.extract_card_info(image_bytes)
+
+        # Get pricing data
+        pricing_data = await price_service.get_pricing(card_info)
+
+        # Calculate total scan time
         scan_time_ms = int((time.time() - start_time) * 1000)
 
         return PricingResult(
-            card=CardInfo(
-                name="Charizard",
-                set="Base Set",
-                number="4/102",
-                rarity="Holo Rare"
-            ),
-            pricing=PricingData(
-                sources=[],
-                statistics={
-                    "median": 0.0,
-                    "average": 0.0,
-                    "count": 0,
-                    "recommendation": "median"
-                }
-            ),
+            card=card_info,
+            pricing=pricing_data,
             metadata=ScanMetadata(
                 scan_time_ms=scan_time_ms,
-                confidence_score=0.0
+                confidence_score=0.95  # TODO: Get actual confidence from OCR
             )
         )
 
