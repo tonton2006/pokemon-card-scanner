@@ -8,6 +8,7 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
+  Image,
 } from 'react-native';
 import { PricingResult } from '../types';
 
@@ -15,13 +16,14 @@ interface ResultsScreenProps {
   route: {
     params: {
       result: PricingResult;
+      imageUri?: string;
     };
   };
   navigation: any;
 }
 
 export default function ResultsScreen({ route, navigation }: ResultsScreenProps) {
-  const { result } = route.params;
+  const { result, imageUri } = route.params;
   const { card, pricing, metadata } = result;
 
   const formatPrice = (price: number) => {
@@ -41,6 +43,17 @@ export default function ResultsScreen({ route, navigation }: ResultsScreenProps)
           ⚡ Scanned in {formatTime(metadata.scan_time_ms)}
         </Text>
       </View>
+
+      {/* Scanned Image */}
+      {imageUri && (
+        <View style={styles.imageContainer}>
+          <Image
+            source={{ uri: imageUri }}
+            style={styles.cardImage}
+            resizeMode="contain"
+          />
+        </View>
+      )}
 
       {/* Card Info */}
       <View style={styles.card}>
@@ -150,6 +163,24 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#fff',
     opacity: 0.9,
+  },
+  imageContainer: {
+    alignItems: 'center',
+    padding: 16,
+    backgroundColor: '#fff',
+    marginHorizontal: 16,
+    marginTop: 16,
+    borderRadius: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  cardImage: {
+    width: 250,
+    height: 350,
+    borderRadius: 8,
   },
   card: {
     backgroundColor: '#fff',

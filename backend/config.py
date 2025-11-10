@@ -13,8 +13,8 @@ class Settings(BaseSettings):
     pokemon_tcg_api_key: str = ""
     pokemon_tcg_api_url: str = "https://api.pokemontcg.io/v2"
 
-    # CORS
-    cors_origins: str = "http://localhost:19006"
+    # CORS - Allow both localhost and WSL IP for development
+    cors_origins: str = "http://localhost:19006,http://localhost:8081,http://192.168.50.229:8081"
 
     # Timeouts (milliseconds)
     ocr_timeout_ms: int = 2500

@@ -15,6 +15,23 @@ from utils.error_handlers import (
 router = APIRouter()
 
 
+@router.post("/scan-debug")
+async def scan_debug(image: UploadFile = File(...)):
+    """Debug endpoint - logs everything about the upload without validation."""
+    print(f"[SCAN-DEBUG] ===== DEBUG REQUEST =====")
+    print(f"[SCAN-DEBUG] filename: {image.filename}")
+    print(f"[SCAN-DEBUG] content_type: '{image.content_type}'")
+    print(f"[SCAN-DEBUG] content_type repr: {repr(image.content_type)}")
+    print(f"[SCAN-DEBUG] content_type is None: {image.content_type is None}")
+    print(f"[SCAN-DEBUG] content_type == '': {image.content_type == ''}")
+    print(f"[SCAN-DEBUG] =======================")
+    return {
+        "filename": image.filename,
+        "content_type": image.content_type,
+        "status": "logged"
+    }
+
+
 @router.get("/health", response_model=HealthResponse)
 async def health_check():
     """
@@ -53,8 +70,19 @@ async def scan_card(image: UploadFile = File(...)):
     start_time = time.time()
 
     try:
+        # Log incoming request details for debugging
+        print(f"[DEBUG] ===== NEW REQUEST =====")
+        print(f"[DEBUG] filename: {image.filename}")
+        print(f"[DEBUG] content_type: '{image.content_type}'")
+        print(f"[DEBUG] content_type is None: {image.content_type is None}")
+        print(f"[DEBUG] content_type type: {type(image.content_type)}")
+        if image.content_type:
+            print(f"[DEBUG] content_type starts with 'image/': {image.content_type.startswith('image/')}")
+        print(f"[DEBUG] =======================")
+
         # Validate image
         if not image.content_type or not image.content_type.startswith("image/"):
+            print(f"[ERROR] Invalid content_type: '{image.content_type}'")
             raise InvalidImageException(
                 "Invalid image format. Please upload a JPEG or PNG image.",
                 details={"content_type": image.content_type}

@@ -60,22 +60,35 @@ export default function CameraScreen({ navigation }: CameraScreenProps) {
       return;
     }
 
+    console.log('[CameraScreen] Starting scan...');
     setLoading(true);
 
     try {
       // Call API to scan card
+      console.log('[CameraScreen] Calling API...');
       const result: PricingResult = await apiClient.scanCard(selectedImage);
+      console.log('[CameraScreen] Got result:', result);
 
-      // Navigate to results screen
-      navigation.navigate('Results', { result });
+      // Navigate to results screen with image
+      console.log('[CameraScreen] Navigating to Results...');
+      navigation.navigate('Results', {
+        result,
+        imageUri: selectedImage  // Pass the image so we can display it
+      });
+      console.log('[CameraScreen] Navigation complete');
     } catch (error: any) {
-      console.error('Scan error:', error);
-      Alert.alert(
-        'Scan Failed',
-        error.message || 'Could not scan card. Please try again.'
-      );
+      console.error('[CameraScreen] Scan error:', error);
+      console.error('[CameraScreen] Error details:', error.message, error.stack);
+
+      // Show error in console for web (Alert doesn't work on web)
+      const errorMessage = error.message || 'Could not scan card. Please try again.';
+      console.error('[CameraScreen] ERROR TO USER:', errorMessage);
+
+      // Also try to show alert (works on native)
+      Alert.alert('Scan Failed', errorMessage);
     } finally {
       setLoading(false);
+      console.log('[CameraScreen] Scan complete, loading=false');
     }
   };
 

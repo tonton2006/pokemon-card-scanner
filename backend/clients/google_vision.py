@@ -15,8 +15,13 @@ class GoogleVisionClient:
         # Set credentials if provided
         if settings.google_application_credentials:
             os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = settings.google_application_credentials
-
-        self.client = vision.ImageAnnotatorClient()
+            self.client = vision.ImageAnnotatorClient()
+            self.use_stub = False
+        else:
+            # No credentials - use stub mode for testing
+            self.client = None
+            self.use_stub = True
+            print("[GoogleVision] No credentials found - using STUB mode")
 
     async def detect_text(self, image_bytes: bytes) -> List[str]:
         """
@@ -57,6 +62,17 @@ class GoogleVisionClient:
         Returns:
             Full text as a single string, or None if no text detected
         """
+        # Stub mode for testing without credentials
+        if self.use_stub:
+            return """
+            Charizard
+            Base Set
+            4/102
+            Rare Holo
+            HP 120
+            Fire Pokemon
+            """
+
         image = types.Image(content=image_bytes)
         response = self.client.text_detection(image=image)
 
